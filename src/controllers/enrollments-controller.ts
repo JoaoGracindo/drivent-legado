@@ -2,7 +2,6 @@ import { Response } from 'express';
 import httpStatus from 'http-status';
 import { AuthenticatedRequest } from '@/middlewares';
 import enrollmentsService from '@/services/enrollments-service';
-import { ViaCEPAddress } from '@/protocols';
 
 export async function getEnrollmentByUser(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
@@ -38,7 +37,7 @@ export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response
     if (error.name === 'NotFoundError') {
       return res.sendStatus(httpStatus.NO_CONTENT);
     }
-    if(error.name === 'InvalidCepError'){
+    if (error.name === 'InvalidCepError') {
       return res.sendStatus(httpStatus.BAD_REQUEST);
     }
   }

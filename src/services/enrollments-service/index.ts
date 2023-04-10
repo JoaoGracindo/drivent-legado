@@ -7,30 +7,21 @@ import { exclude } from '@/utils/prisma-utils';
 import { ViaCEPAddress } from '@/protocols';
 
 async function getAddressFromCEP(cep: string) {
-
-
   const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
   if (!result.data) {
     throw notFoundError();
   }
-  if(result.data.erro){
+  if (result.data.erro) {
     throw invalidCepError();
   }
-  const {
-    logradouro,
-    complemento,
-    bairro,
-    localidade: cidade,
-    uf
-  }: ViaCEPAddress = result.data;
-
+  const { logradouro, complemento, bairro, localidade: cidade, uf }: ViaCEPAddress = result.data;
 
   return {
     logradouro,
     complemento,
     bairro,
     cidade,
-    uf
+    uf,
   };
 }
 
