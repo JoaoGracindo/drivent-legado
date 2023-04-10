@@ -1,12 +1,10 @@
 import { Address, Enrollment } from '@prisma/client';
 import { request } from '@/utils/request';
-import { invalidDataError, notFoundError } from '@/errors';
+import { invalidCepError, invalidDataError, notFoundError } from '@/errors';
 import addressRepository, { CreateAddressParams } from '@/repositories/address-repository';
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
-import dotenv from 'dotenv';
 import { ViaCEPAddress } from '@/protocols';
-dotenv.config();
 
 async function getAddressFromCEP(cep: string) {
 
@@ -15,8 +13,8 @@ async function getAddressFromCEP(cep: string) {
   if (!result.data) {
     throw notFoundError();
   }
-  if(result.data.erro === true){
-    throw new Error()
+  if(result.data.erro){
+    throw invalidCepError();
   }
   const {
     logradouro,
