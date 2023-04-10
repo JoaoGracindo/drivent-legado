@@ -6,3 +6,10 @@ export function notFoundError(): ApplicationError {
     message: 'No result for this search!',
   };
 }
+
+export function invalidCepError(): ApplicationError {
+  return {
+    name: 'invalidCepError',
+    message: 'Invalid CEP',
+  };
+}

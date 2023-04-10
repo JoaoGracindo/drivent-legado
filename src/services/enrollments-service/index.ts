@@ -8,13 +8,23 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function getAddressFromCEP(cep: string) {
-  const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
+
+  const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
   if (!result.data) {
     throw notFoundError();
   }
-
-  return result;
+  if(result.data.erro === true){
+    throw new Error()
+  }
+  const address = {
+    logradouro: result.data.logradouro,
+    complemento: result.data.complemento,
+    bairro: result.data.bairro,
+    cidade: result.data.localidade,
+    uf: result.data.uf
+  }
+  return address;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
