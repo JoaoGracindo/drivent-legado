@@ -5,6 +5,7 @@ import addressRepository, { CreateAddressParams } from '@/repositories/address-r
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
 import dotenv from 'dotenv';
+import { ViaCEPAddress } from '@/protocols';
 dotenv.config();
 
 async function getAddressFromCEP(cep: string) {
@@ -17,7 +18,7 @@ async function getAddressFromCEP(cep: string) {
   if(result.data.erro === true){
     throw new Error()
   }
-  const address = {
+  const address: ViaCEPAddress = {
     logradouro: result.data.logradouro,
     complemento: result.data.complemento,
     bairro: result.data.bairro,
