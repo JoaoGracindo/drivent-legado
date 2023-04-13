@@ -24,3 +24,14 @@ export async function getTicketTypes(req: AuthenticatedRequest, res: Response) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 }
+
+export async function getTicketsByUserId(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+
+  try {
+    const result = await ticketsService.getUserTickets(userId);
+    return res.status(httpStatus.OK).send(result);
+  } catch (error) {
+    return res.sendStatus(httpStatus.NOT_FOUND);
+  }
+}

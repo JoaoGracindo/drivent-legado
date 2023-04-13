@@ -13,8 +13,19 @@ export async function postTicket(userId: number, ticketTypeId: number) {
   return result;
 }
 
+export async function getUserTickets(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) throw notFoundError();
+
+  const tickets = await ticketsRepository.findTicketsWithTicketType(enrollment.id);
+  if (!tickets) throw notFoundError();
+
+  return tickets;
+}
+
 const ticketsService = {
   postTicket,
+  getUserTickets,
 };
 
 export default ticketsService;
