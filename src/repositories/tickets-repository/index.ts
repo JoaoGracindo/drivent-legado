@@ -1,10 +1,25 @@
-import { Ticket } from '@prisma/client';
+import { prisma } from '@/config';
 
 async function postTicket(enrollmentId: number, ticketTypeId: number) {
-  return { enrollmentId, ticketTypeId };
+  return await prisma.ticket.create({
+    data: {
+      status: 'RESERVED',
+      Enrollment: {
+        connect: {
+          id: enrollmentId,
+        },
+      },
+      TicketType: {
+        connect: {
+          id: ticketTypeId,
+        },
+      },
+    },
+    include: {
+      TicketType: true,
+    },
+  });
 }
-
-export type CreateTicketParams = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'status'>;
 
 const ticketsRepository = {
   postTicket,
