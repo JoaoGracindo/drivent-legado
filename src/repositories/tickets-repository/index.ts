@@ -21,8 +21,13 @@ async function postTicket(enrollmentId: number, ticketTypeId: number) {
   });
 }
 
+async function getTypes() {
+  return await prisma.ticketType.findMany();
+}
+
 const ticketsRepository = {
   postTicket,
+  getTypes,
 };
 
 export default ticketsRepository;
