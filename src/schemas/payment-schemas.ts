@@ -1,3 +1,4 @@
+import { Payment } from '@prisma/client';
 import Joi from 'joi';
 
 export const paymentSchema = Joi.object({
@@ -10,3 +11,16 @@ export const paymentSchema = Joi.object({
     cvv: Joi.number().required(),
   }).required(),
 });
+
+export type PaymentInput = Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>;
+
+export type PaymentInformation = {
+  ticketId: number;
+  cardData: {
+    issuer: string;
+    number: number;
+    name: string;
+    expirationDate: Date;
+    cvv: number;
+  };
+};
