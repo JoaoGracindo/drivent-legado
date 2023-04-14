@@ -26,9 +26,10 @@ export async function getPayment(req: AuthenticatedRequest, res: Response) {
 
 export async function postPayment(req: AuthenticatedRequest, res: Response) {
   const paymentInformation = req.body as PaymentInformation;
+  const { userId } = req;
 
   try {
-    const result = await paymentsService.makePayment(paymentInformation);
+    const result = await paymentsService.makePayment(paymentInformation, userId);
 
     return res.status(httpStatus.OK).send(result);
   } catch (error) {

@@ -14,14 +14,19 @@ export async function getPayment(ticketId: number, userId: number) {
   return payment;
 }
 
-export async function makePayment(paymentInformation: PaymentInformation) {
+export async function makePayment(paymentInformation: PaymentInformation, userId: number) {
   const { ticketId, cardData } = paymentInformation;
+
   const cardLastDigits = cardData.number.toString().slice(-4);
 
   const {
     TicketType: { price },
+    Enrollment: { userId: ticketUserId },
   } = await ticketsRepository.getTypeById(ticketId);
+
   if (!price) throw notFoundError();
+
+  if (userId !== ticketUserId) throw unauthorizedError();
 
   const data = {
     ticketId,
@@ -32,7 +37,7 @@ export async function makePayment(paymentInformation: PaymentInformation) {
 
   const result = await paymentRepository.makePayment(data);
 
-  ticketsRepository.updateStatus(data.ticketId);
+  await ticketsRepository.updateStatus(data.ticketId);
 
   return result;
 }

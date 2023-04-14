@@ -47,18 +47,23 @@ async function getTypeById(id: number) {
           price: true,
         },
       },
+      Enrollment: {
+        select: {
+          userId: true,
+        },
+      },
     },
     rejectOnNotFound: true,
   });
 }
 
 async function updateStatus(id: number) {
-  prisma.ticket.update({
-    data: {
-      status: 'PAID',
-    },
+  return prisma.ticket.update({
     where: {
       id,
+    },
+    data: {
+      status: 'PAID',
     },
   });
 }
