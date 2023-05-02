@@ -18,6 +18,9 @@ async function createBooking(roomId: number, userId: number) {
       roomId,
       userId,
     },
+    select: {
+      id: true,
+    },
   });
 }
 
@@ -28,6 +31,9 @@ async function changeRoom(roomId: number, bookingId: number) {
     },
     data: {
       roomId,
+    },
+    select: {
+      id: true,
     },
   });
 }
