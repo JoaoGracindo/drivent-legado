@@ -1,50 +1,45 @@
-import paymentRepository from '@/repositories/payment-repository';
 import { notFoundError, unauthorizedError } from '@/errors';
-import { PaymentInformation, PaymentInput } from '@/schemas/payment-schemas';
+import { CardPaymentParams, PaymentParams } from '@/protocols';
+import enrollmentRepository from '@/repositories/enrollment-repository';
+import paymentsRepository from '@/repositories/payments-repository';
 import ticketsRepository from '@/repositories/tickets-repository';
 
-export async function getPayment(ticketId: number, userId: number) {
-  const {
-    Payment: [payment],
-    Enrollment: { userId: userEnrollmentId },
-  } = await ticketsRepository.getPaymentByTicketId(ticketId);
+async function verifyTicketAndEnrollment(ticketId: number, userId: number) {
+  const ticket = await ticketsRepository.findTickeyById(ticketId);
+  if (!ticket) throw notFoundError();
 
-  if (userId !== userEnrollmentId) throw unauthorizedError();
+  const enrollment = await enrollmentRepository.findById(ticket.enrollmentId);
+  if (!enrollment) throw notFoundError();
+
+  if (enrollment.userId !== userId) throw unauthorizedError();
+}
+
+async function getPaymentByTicketId(userId: number, ticketId: number) {
+  await verifyTicketAndEnrollment(ticketId, userId);
+
+  const payment = await paymentsRepository.findPaymentByTicketId(ticketId);
+  if (!payment) throw notFoundError();
 
   return payment;
 }
 
-export async function makePayment(paymentInformation: PaymentInformation, userId: number) {
-  const { ticketId, cardData } = paymentInformation;
+async function paymentProcess(ticketId: number, userId: number, cardData: CardPaymentParams) {
+  await verifyTicketAndEnrollment(ticketId, userId);
 
-  const cardLastDigits = cardData.number.toString().slice(-4);
+  const ticket = await ticketsRepository.findTickeWithTypeById(ticketId);
 
-  const {
-    TicketType: { price },
-    Enrollment: { userId: ticketUserId },
-  } = await ticketsRepository.getTypeById(ticketId);
-
-  if (!price) throw notFoundError();
-
-  if (userId !== ticketUserId) throw unauthorizedError();
-
-  const data = {
+  const paymentData: PaymentParams = {
     ticketId,
+    value: ticket.TicketType.price,
     cardIssuer: cardData.issuer,
-    cardLastDigits,
-    value: price,
-  } as PaymentInput;
+    cardLastDigits: cardData.number.toString().slice(-4),
+  };
 
-  const result = await paymentRepository.makePayment(data);
+  const payment = await paymentsRepository.createPayment(ticketId, paymentData);
 
-  await ticketsRepository.updateStatus(data.ticketId);
+  await ticketsRepository.ticketProcessPayment(ticketId);
 
-  return result;
+  return payment;
 }
 
-const paymentsService = {
-  getPayment,
-  makePayment,
-};
-
-export default paymentsService;
+export default { getPaymentByTicketId, paymentProcess };
