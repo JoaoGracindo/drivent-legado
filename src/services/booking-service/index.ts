@@ -1,3 +1,4 @@
+import hotelsService from '../hotels-service';
 import { notFoundError } from '@/errors';
 import bookingRepository from '@/repositories/booking-repository';
 
@@ -9,6 +10,8 @@ async function getBooking(userId: number) {
 }
 
 async function createBooking(userId: number, roomId: number) {
+  hotelsService.listHotels(userId);
+
   const roomExists = await bookingRepository.checkIfRoomExists(roomId);
   if (roomExists === null) throw notFoundError();
 

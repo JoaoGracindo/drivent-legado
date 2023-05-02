@@ -36,7 +36,7 @@ export async function changeRoom(req: AuthenticatedRequest, res: Response) {
   if (!roomId || isNaN(roomId) || !bookingId || isNaN(bookingId)) return res.sendStatus(httpStatus.NOT_FOUND);
 
   try {
-    const bookingId = await bookingService.createBooking(userId, roomId);
+    const bookingId = await bookingService.changeRoom(userId, roomId);
     return res.status(httpStatus.OK).send(bookingId);
   } catch (error) {
     if (error.name === 'NotFoundError') return res.sendStatus(httpStatus.NOT_FOUND);
